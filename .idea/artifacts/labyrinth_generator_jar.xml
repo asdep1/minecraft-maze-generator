@@ -2,7 +2,7 @@
   <artifact type="jar" name="labyrinth-generator:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/labyrinth_generator_jar</output-path>
     <root id="archive" name="labyrinth-generator.jar">
-      <element id="module-output" name="labyrinth-generator" />
+      <element id="module-output" name="minecraft-maze-generator" />
     </root>
   </artifact>
 </component>
