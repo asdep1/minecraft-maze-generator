@@ -1,4 +1,4 @@
-# Minecraft Labyrinth Generator
+# Minecraft Maze Generator
 
 Un outil externe puissant pour générer des labyrinthes complexes et personnalisés pour Minecraft. Ce projet permet de créer des structures prêtes à l'emploi, allant des formats schématiques classiques aux mondes Minecraft complets.
 
@@ -53,6 +53,16 @@ config.addRoom(new Room(5, 5, 20, 20, 2));
 Ajout d'une zone d'érosion :
 ```java
 config.addErosionZone(new ErosionZone(0, 0, 25, 25, 0.3f));
+```
+
+Utilisation avec paramètres dans un terminal :
+```shell
+java -Xmx2G minecraft-maze-generator-1.0.1.jar -v 1.12.2 -w 250 -d 250 -h 25 -c 10 -ww 7 -f 0.2 -ce false -baseY 64 -erosion-area 15 20 15 20 0.5 -room 100 100 50 50 19 -ex-schem test -ex-img test -ex-world test -theme stone -alg recursive-backtracker
+```
+
+Utilsation sans paramètres dans un terminal :
+```shell
+java -Xmx2G minecraft-maze-generator-1.0.1.jar`
 ```
 
 Pallete de blocs par version dans `versions/`.
