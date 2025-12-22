@@ -23,11 +23,6 @@ public enum MazeAlgorithm {
         this.algoClass = algoClass;
     }
 
-    public String getName() {
-        return name;
-    }
-    public Class<? extends Maze> getAlgoClass() {return algoClass;}
-
     public static MazeAlgorithm fromName(String name) {
         for (MazeAlgorithm algo : values()) {
             if (algo.name.equalsIgnoreCase(name) || algo.name().equalsIgnoreCase(name)) {
@@ -43,5 +38,13 @@ public enum MazeAlgorithm {
             list.add(algo.getName());
         }
         return list;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Class<? extends Maze> getAlgoClass() {
+        return algoClass;
     }
 }

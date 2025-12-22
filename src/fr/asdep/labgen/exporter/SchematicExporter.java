@@ -52,13 +52,13 @@ public class SchematicExporter {
             nos.writeTagShort("Height", (short) height);
             nos.writeTagShort("Length", (short) length);
             nos.writeTagString("Materials", "Alpha");
-            
+
             nos.writeTagByteArray("Blocks", blocks, p -> {
                 written[0] = p;
                 pbSave.update((int) (written[0] / 1024));
             });
             final long afterBlocks = written[0];
-            
+
             if (add != null) {
                 nos.writeTagByteArray("AddBlocks", add, p -> {
                     pbSave.update((int) ((afterBlocks + p) / 1024));
@@ -76,7 +76,7 @@ public class SchematicExporter {
                     pbSave.update((int) ((afterBlocks + p) / 1024));
                 });
             }
-            
+
             nos.writeTagEnd();
         }
     }

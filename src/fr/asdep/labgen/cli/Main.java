@@ -4,14 +4,10 @@ import fr.asdep.labgen.core.*;
 import fr.asdep.labgen.exporter.ImageExporter;
 import fr.asdep.labgen.exporter.SchematicExporter;
 import fr.asdep.labgen.exporter.WorldExporter;
-import fr.asdep.labgen.mc.BlockState;
 import fr.asdep.labgen.mc.Theme;
 import fr.asdep.labgen.mc.ThemeLoader;
-import fr.asdep.labgen.mc.WeightedBlock;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -35,7 +31,7 @@ public class Main {
      * -theme theme (stone)
      * -alg alg (recursive-backtracker)
      * -v 1.12.2 -w 250 -d 250 -h 25 -c 10 -ww 7 -f 0.2 -ce false -baseY 64 -erosion-area 15 20 15 20 0.5 -room 100 100 50 50 19 -ex-schem test -ex-img test -ex-world test -theme stone -alg recursive-backtracker
-     * 
+     *
      * @param args
      */
     public static void main(String[] args) {
@@ -58,7 +54,7 @@ public class Main {
 
     public static void main() {
         System.out.println("=== Labyrinth Generator for Minecraft ===");
-        
+
         Scanner scanner = new Scanner(System.in);
 
         GenerationConfig generationConfig = new GenerationConfig();
@@ -162,21 +158,21 @@ public class Main {
         }
 
         System.out.print("Exporter en schematic ? (oui/non) ");
-        if (scanner.nextLine().trim().toLowerCase().equals("oui")) {
+        if (scanner.nextLine().trim().equalsIgnoreCase("oui")) {
             exportConfig.setExportSchematic(true);
             System.out.print("Nom du fichier de sortie: ");
             String input = scanner.nextLine().trim();
             if (!input.isEmpty()) exportConfig.setSchematicName(input);
         }
         System.out.print("Exporter en image PNG ? (oui/non) ");
-        if (scanner.nextLine().trim().toLowerCase().equals("oui")) {
+        if (scanner.nextLine().trim().equalsIgnoreCase("oui")) {
             exportConfig.setExportImage(true);
             System.out.print("Nom du fichier de sortie: ");
             String input = scanner.nextLine().trim();
             if (!input.isEmpty()) exportConfig.setImageName(input);
         }
         System.out.print("Exporter en monde ? (oui/non) ");
-        if (scanner.nextLine().trim().toLowerCase().equals("oui")) {
+        if (scanner.nextLine().trim().equalsIgnoreCase("oui")) {
             exportConfig.setExportWorld(true);
             System.out.print("Nom du dossier de sortie: ");
             String input = scanner.nextLine().trim();
@@ -199,16 +195,16 @@ public class Main {
             generationConfig.setTheme(Theme.getDefault());
         }
 
-        System.out.print("Choisissez l'algorythme "+ MazeAlgorithm.listAlgorithms() +" : ");
+        System.out.print("Choisissez l'algorythme " + MazeAlgorithm.listAlgorithms() + " : ");
         String algorithmStr = scanner.nextLine().trim();
-        if (MazeAlgorithm.fromName(algorithmStr) == null ) {
+        if (MazeAlgorithm.fromName(algorithmStr) == null) {
             algorithmStr = "recursive-backtracker";
         }
         generationConfig.setAlgorithm(MazeAlgorithm.fromName(algorithmStr));
 
         t(generationConfig, exportConfig);
     }
-    
+
     private static void parseArguments(String[] args, GenerationConfig generationConfig, ExportConfig exportConfig) throws IOException {
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -342,12 +338,12 @@ public class Main {
         System.out.println("Exportation...");
         try {
             if (exportConfig.isExportSchematic()) {
-                SchematicExporter.export(generator, exportConfig.getSchematicName()+".schematic");
+                SchematicExporter.export(generator, exportConfig.getSchematicName() + ".schematic");
                 System.out.println("  - Exporté vers " + exportConfig.getSchematicName() + ".schematic (Schematic)");
             }
 
             if (exportConfig.isExportImage()) {
-                ImageExporter.export(generator, exportConfig.getImageName()+".png");
+                ImageExporter.export(generator, exportConfig.getImageName() + ".png");
                 System.out.println("  - Exporté vers " + exportConfig.getImageName() + ".png (Image PNG)");
             }
 

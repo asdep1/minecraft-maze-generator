@@ -3,6 +3,8 @@ package fr.asdep.labgen.core;
 import fr.asdep.labgen.mc.Theme;
 
 public class GenerationConfig {
+    private final java.util.List<Room> rooms;
+    private final java.util.List<ErosionZone> erosionZones;
     private int width; // X
     private int depth; // Z
     private int height; // Y
@@ -13,9 +15,6 @@ public class GenerationConfig {
     private boolean ceilingEnabled; // avec/sans plafond
     private Theme theme;
     private MazeAlgorithm algorithm;
-    private final java.util.List<Room> rooms;
-    private final java.util.List<ErosionZone> erosionZones;
-
     private String gameVersion;
 
     public GenerationConfig() {

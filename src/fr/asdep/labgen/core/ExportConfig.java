@@ -20,39 +20,47 @@ public class ExportConfig {
     public boolean isExportSchematic() {
         return exportSchematic;
     }
+
+    public void setExportSchematic(boolean exportSchematic) {
+        this.exportSchematic = exportSchematic;
+    }
+
     public String getSchematicName() {
         return schematicName;
+    }
+
+    public void setSchematicName(String schematicName) {
+        this.schematicName = schematicName;
     }
 
     public boolean isExportImage() {
         return exportImage;
     }
+
+    public void setExportImage(boolean exportImage) {
+        this.exportImage = exportImage;
+    }
+
     public String getImageName() {
         return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
     }
 
     public boolean isExportWorld() {
         return exportWorld;
     }
+
+    public void setExportWorld(boolean exportWorld) {
+        this.exportWorld = exportWorld;
+    }
+
     public String getWorldName() {
         return worldName;
     }
 
-    public void setExportSchematic(boolean exportSchematic) {
-        this.exportSchematic = exportSchematic;
-    }
-    public void setSchematicName(String schematicName) {
-        this.schematicName = schematicName;
-    }
-    public void setExportImage(boolean exportImage) {
-        this.exportImage = exportImage;
-    }
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
-    }
-    public void setExportWorld(boolean exportWorld) {
-        this.exportWorld = exportWorld;
-    }
     public void setWorldName(String worldName) {
         this.worldName = worldName;
     }

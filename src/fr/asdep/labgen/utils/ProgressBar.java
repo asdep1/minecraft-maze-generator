@@ -42,14 +42,14 @@ public class ProgressBar {
             else sb.append("-");
         }
         sb.append("] ")
-          .append(String.format("%3d%%", percent))
-          .append(" (")
-          .append(current)
-          .append("/")
-          .append(total)
-          .append(")");
+                .append(String.format("%3d%%", percent))
+                .append(" (")
+                .append(current)
+                .append("/")
+                .append(total)
+                .append(")");
 
-        System.out.print(sb.toString());
+        System.out.print(sb);
         System.out.flush();
         if (current >= total) {
             System.out.println();
