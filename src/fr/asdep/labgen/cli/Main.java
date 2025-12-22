@@ -16,12 +16,53 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+
+    /**
+     * -v version (1.12.2, 1.20.1)
+     * -w width (250)
+     * -d depth (250)
+     * -h height (25)
+     * -c corridorWidth (10)
+     * -ww wallWidth (7)
+     * -f erosion (0.2)
+     * -ce ceiling (false)
+     * -baseY baseY (64)
+     * -erosion-area erosion-area (x z width depth factor)
+     * -room room (x z width depth entrances)
+     * -ex-schem filenames (maze_output)
+     * -ex-img filenames (maze_output)
+     * -ex-world dirname (maze_output)
+     * -theme theme (stone)
+     * -alg alg (recursive-backtracker)
+     * -v 1.12.2 -w 250 -d 250 -h 25 -c 10 -ww 7 -f 0.2 -ce false -baseY 64 -erosion-area 15 20 15 20 0.5 -room 100 100 50 50 19 -ex-schem test -ex-img test -ex-world test -theme stone -alg recursive-backtracker
+     * 
+     * @param args
+     */
     public static void main(String[] args) {
+        if (args.length > 0) {
+            GenerationConfig generationConfig = new GenerationConfig();
+            ExportConfig exportConfig = new ExportConfig();
+
+            try {
+                parseArguments(args, generationConfig, exportConfig);
+                t(generationConfig, exportConfig);
+            } catch (Exception e) {
+                System.err.println("Erreur lors du parsing des arguments : " + e.getMessage());
+                e.printStackTrace();
+                System.exit(1);
+            }
+        } else {
+            main();
+        }
+    }
+
+    public static void main() {
         System.out.println("=== Labyrinth Generator for Minecraft ===");
         
         Scanner scanner = new Scanner(System.in);
 
-        GenerationConfig config = new GenerationConfig();
+        GenerationConfig generationConfig = new GenerationConfig();
+        ExportConfig exportConfig = new ExportConfig();
 
         // Game version
         System.out.print("Version du jeu (1.12.2 ou 1.20.1) [défaut: 1.12.2]: ");
@@ -29,52 +70,52 @@ public class Main {
         if (version.isEmpty()) {
             version = "1.12.2";
         }
-        config.setGameVersion(version);
+        generationConfig.setGameVersion(version);
 
         // Dimensions
         System.out.print("Largeur du labyrinthe en cellules [défaut: 250]: ");
         String widthStr = scanner.nextLine().trim();
         int width = widthStr.isEmpty() ? 250 : Integer.parseInt(widthStr);
-        config.setWidth(width);
+        generationConfig.setWidth(width);
 
         System.out.print("Profondeur du labyrinthe en cellules [défaut: 250]: ");
         String depthStr = scanner.nextLine().trim();
         int depth = depthStr.isEmpty() ? 250 : Integer.parseInt(depthStr);
-        config.setDepth(depth);
+        generationConfig.setDepth(depth);
 
         System.out.print("Hauteur des murs en blocs [défaut: 25]: ");
         String heightStr = scanner.nextLine().trim();
         int height = heightStr.isEmpty() ? 25 : Integer.parseInt(heightStr);
-        config.setHeight(height);
+        generationConfig.setHeight(height);
 
         // Corridor and wall widths
         System.out.print("Largeur des couloirs en blocs [défaut: 10]: ");
         String corridorStr = scanner.nextLine().trim();
         int corridorWidth = corridorStr.isEmpty() ? 10 : Integer.parseInt(corridorStr);
-        config.setCorridorWidth(corridorWidth);
+        generationConfig.setCorridorWidth(corridorWidth);
 
         System.out.print("Largeur des murs en blocs [défaut: 7]: ");
         String wallStr = scanner.nextLine().trim();
         int wallWidth = wallStr.isEmpty() ? 7 : Integer.parseInt(wallStr);
-        config.setWallWidth(wallWidth);
+        generationConfig.setWallWidth(wallWidth);
 
         // Erosion
         System.out.print("Facteur d'érosion (0.0 à 1.0) [défaut: 0.2]: ");
         String erosionStr = scanner.nextLine().trim();
         float erosion = erosionStr.isEmpty() ? 0.2f : Float.parseFloat(erosionStr);
-        config.setErosion(erosion);
+        generationConfig.setErosion(erosion);
 
         // Ceiling
         System.out.print("Activer le plafond ? (oui/non) [défaut: non]: ");
         String ceilingStr = scanner.nextLine().trim().toLowerCase();
         boolean ceiling = ceilingStr.equals("oui") || ceilingStr.equals("o") || ceilingStr.equals("yes") || ceilingStr.equals("y");
-        config.setCeilingEnabled(ceiling);
+        generationConfig.setCeilingEnabled(ceiling);
 
         // Base Y
         System.out.print("Coordonnée Y de base [défaut: 64]: ");
         String baseYStr = scanner.nextLine().trim();
         int baseY = baseYStr.isEmpty() ? 64 : Integer.parseInt(baseYStr);
-        config.setBaseY(baseY);
+        generationConfig.setBaseY(baseY);
 
         // Erosion zones
         System.out.print("Ajouter des zones d'érosion ? (oui/non) [défaut: non]: ");
@@ -94,7 +135,7 @@ public class Main {
                 int zoneDepth = Integer.parseInt(scanner.nextLine().trim());
                 System.out.print("  Facteur d'érosion: ");
                 float zoneFactor = Float.parseFloat(scanner.nextLine().trim());
-                config.addErosionZone(new ErosionZone(zoneX, zoneZ, zoneWidth, zoneDepth, zoneFactor));
+                generationConfig.addErosionZone(new ErosionZone(zoneX, zoneZ, zoneWidth, zoneDepth, zoneFactor));
             }
         }
 
@@ -116,39 +157,35 @@ public class Main {
                 int roomDepth = Integer.parseInt(scanner.nextLine().trim());
                 System.out.print("  Nombre d'entrées: ");
                 int entrances = Integer.parseInt(scanner.nextLine().trim());
-                config.addRoom(new Room(roomX, roomZ, roomWidth, roomDepth, entrances));
+                generationConfig.addRoom(new Room(roomX, roomZ, roomWidth, roomDepth, entrances));
             }
         }
 
-        String filename = "maze_output";
-        String imageFilename = "maze_output";
-        String worldName = "MazeWorld";
-
         System.out.print("Exporter en schematic ? (oui/non) ");
-        boolean exportSchematic = scanner.nextLine().trim().toLowerCase().equals("oui");
-        if (exportSchematic) {
+        if (scanner.nextLine().trim().toLowerCase().equals("oui")) {
+            exportConfig.setExportSchematic(true);
             System.out.print("Nom du fichier de sortie: ");
             String input = scanner.nextLine().trim();
-            if (!input.isEmpty()) filename = input;
+            if (!input.isEmpty()) exportConfig.setSchematicName(input);
         }
         System.out.print("Exporter en image PNG ? (oui/non) ");
-        boolean exportImage = scanner.nextLine().trim().toLowerCase().equals("oui");
-        if (exportImage) {
+        if (scanner.nextLine().trim().toLowerCase().equals("oui")) {
+            exportConfig.setExportImage(true);
             System.out.print("Nom du fichier de sortie: ");
             String input = scanner.nextLine().trim();
-            if (!input.isEmpty()) imageFilename = input;
+            if (!input.isEmpty()) exportConfig.setImageName(input);
         }
         System.out.print("Exporter en monde ? (oui/non) ");
-        boolean exportWorld = scanner.nextLine().trim().toLowerCase().equals("oui");
-        if (exportWorld) {
+        if (scanner.nextLine().trim().toLowerCase().equals("oui")) {
+            exportConfig.setExportWorld(true);
             System.out.print("Nom du dossier de sortie: ");
             String input = scanner.nextLine().trim();
-            if (!input.isEmpty()) worldName = input;
+            if (!input.isEmpty()) exportConfig.setWorldName(input);
         }
 
         // Theme selection
-        List<String> availableThemes = ThemeLoader.listThemes(config.getGameVersion());
-        System.out.println("Thèmes disponibles pour " + config.getGameVersion() + " : " + availableThemes);
+        List<String> availableThemes = ThemeLoader.listThemes(generationConfig.getGameVersion());
+        System.out.println("Thèmes disponibles pour " + generationConfig.getGameVersion() + " : " + availableThemes);
         System.out.print("Choisir un thème [défaut: stone]: ");
         String selectedTheme = scanner.nextLine().trim();
         if (selectedTheme.isEmpty()) {
@@ -156,10 +193,10 @@ public class Main {
         }
 
         try {
-            config.setTheme(ThemeLoader.loadTheme(config.getGameVersion(), selectedTheme));
+            generationConfig.setTheme(ThemeLoader.loadTheme(generationConfig.getGameVersion(), selectedTheme));
         } catch (IOException e) {
             System.err.println("Erreur lors du chargement du thème, utilisation du thème par défaut.");
-            config.setTheme(Theme.getDefault());
+            generationConfig.setTheme(Theme.getDefault());
         }
 
         System.out.print("Choisissez l'algorythme "+ MazeAlgorithm.listAlgorithms() +" : ");
@@ -167,31 +204,156 @@ public class Main {
         if (MazeAlgorithm.fromName(algorithmStr) == null ) {
             algorithmStr = "recursive-backtracker";
         }
-        config.setAlgorithm(MazeAlgorithm.fromName(algorithmStr));
+        generationConfig.setAlgorithm(MazeAlgorithm.fromName(algorithmStr));
 
+        t(generationConfig, exportConfig);
+    }
+    
+    private static void parseArguments(String[] args, GenerationConfig generationConfig, ExportConfig exportConfig) throws IOException {
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+
+            switch (arg) {
+                case "-v":
+                    if (i + 1 < args.length) {
+                        generationConfig.setGameVersion(args[++i]);
+                    }
+                    break;
+                case "-w":
+                    if (i + 1 < args.length) {
+                        generationConfig.setWidth(Integer.parseInt(args[++i]));
+                    }
+                    break;
+                case "-d":
+                    if (i + 1 < args.length) {
+                        generationConfig.setDepth(Integer.parseInt(args[++i]));
+                    }
+                    break;
+                case "-h":
+                    if (i + 1 < args.length) {
+                        generationConfig.setHeight(Integer.parseInt(args[++i]));
+                    }
+                    break;
+                case "-c":
+                    if (i + 1 < args.length) {
+                        generationConfig.setCorridorWidth(Integer.parseInt(args[++i]));
+                    }
+                    break;
+                case "-ww":
+                    if (i + 1 < args.length) {
+                        generationConfig.setWallWidth(Integer.parseInt(args[++i]));
+                    }
+                    break;
+                case "-f":
+                    if (i + 1 < args.length) {
+                        generationConfig.setErosion(Float.parseFloat(args[++i]));
+                    }
+                    break;
+                case "-ce":
+                    if (i + 1 < args.length) {
+                        generationConfig.setCeilingEnabled(Boolean.parseBoolean(args[++i]));
+                    }
+                    break;
+                case "-baseY":
+                    if (i + 1 < args.length) {
+                        generationConfig.setBaseY(Integer.parseInt(args[++i]));
+                    }
+                    break;
+                case "-erosion-area":
+                    if (i + 5 < args.length) {
+                        int x = Integer.parseInt(args[++i]);
+                        int z = Integer.parseInt(args[++i]);
+                        int width = Integer.parseInt(args[++i]);
+                        int depth = Integer.parseInt(args[++i]);
+                        float factor = Float.parseFloat(args[++i]);
+                        generationConfig.addErosionZone(new ErosionZone(x, z, width, depth, factor));
+                    }
+                    break;
+                case "-room":
+                    if (i + 5 < args.length) {
+                        int x = Integer.parseInt(args[++i]);
+                        int z = Integer.parseInt(args[++i]);
+                        int width = Integer.parseInt(args[++i]);
+                        int depth = Integer.parseInt(args[++i]);
+                        int entrances = Integer.parseInt(args[++i]);
+                        generationConfig.addRoom(new Room(x, z, width, depth, entrances));
+                    }
+                    break;
+                case "-ex-schem":
+                    if (i + 1 < args.length) {
+                        exportConfig.setExportSchematic(true);
+                        exportConfig.setSchematicName(args[++i]);
+                    }
+                    break;
+                case "-ex-img":
+                    if (i + 1 < args.length) {
+                        exportConfig.setExportImage(true);
+                        exportConfig.setImageName(args[++i]);
+                    }
+                    break;
+                case "-ex-world":
+                    if (i + 1 < args.length) {
+                        exportConfig.setExportWorld(true);
+                        exportConfig.setWorldName(args[++i]);
+                    }
+                    break;
+                case "-theme":
+                    if (i + 1 < args.length) {
+                        String themeName = args[++i];
+                        generationConfig.setTheme(ThemeLoader.loadTheme(generationConfig.getGameVersion(), themeName));
+                    }
+                    break;
+                case "-alg":
+                    if (i + 1 < args.length) {
+                        String algName = args[++i];
+                        MazeAlgorithm algorithm = MazeAlgorithm.fromName(algName);
+                        if (algorithm != null) {
+                            generationConfig.setAlgorithm(algorithm);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        // Set default theme if not specified
+        if (generationConfig.getTheme() == null) {
+            try {
+                generationConfig.setTheme(ThemeLoader.loadTheme(generationConfig.getGameVersion(), "stone"));
+            } catch (IOException e) {
+                generationConfig.setTheme(Theme.getDefault());
+            }
+        }
+
+        // Set default algorithm if not specified
+        if (generationConfig.getAlgorithm() == null) {
+            generationConfig.setAlgorithm(MazeAlgorithm.fromName("recursive-backtracker"));
+        }
+    }
+
+    public static void t(GenerationConfig generationConfig, ExportConfig exportConfig) {
         System.out.println("Configuration :");
-        System.out.println(config);
+        System.out.println(generationConfig);
 
         System.out.println("Génération du labyrinthe...");
 
-        MazeGenerator generator = new MazeGenerator(config);
+        MazeGenerator generator = new MazeGenerator(generationConfig);
         generator.generate();
 
         System.out.println("Exportation...");
         try {
-            if (exportSchematic) {
-                SchematicExporter.export(generator, filename+".schematic");
-                System.out.println("  - Exporté vers " + filename + ".schematic (Schematic)");
+            if (exportConfig.isExportSchematic()) {
+                SchematicExporter.export(generator, exportConfig.getSchematicName()+".schematic");
+                System.out.println("  - Exporté vers " + exportConfig.getSchematicName() + ".schematic (Schematic)");
             }
 
-            if (exportImage) {
-                ImageExporter.export(generator, imageFilename+".png");
-                System.out.println("  - Exporté vers " + imageFilename + ".png (Image PNG)");
+            if (exportConfig.isExportImage()) {
+                ImageExporter.export(generator, exportConfig.getImageName()+".png");
+                System.out.println("  - Exporté vers " + exportConfig.getImageName() + ".png (Image PNG)");
             }
 
-            if (exportWorld) {
-                WorldExporter.export(generator, worldName);
-                System.out.println("  - Exporté vers le dossier monde: " + worldName);
+            if (exportConfig.isExportWorld()) {
+                WorldExporter.export(generator, exportConfig.getWorldName());
+                System.out.println("  - Exporté vers le dossier monde: " + exportConfig.getWorldName());
             }
 
             System.out.println("Succès !");
