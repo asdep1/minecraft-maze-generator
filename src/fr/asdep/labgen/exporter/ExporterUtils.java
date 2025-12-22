@@ -1,7 +1,7 @@
 package fr.asdep.labgen.exporter;
 
 public class ExporterUtils {
-    public static void setNibble(byte[] data, int index, int value) {
+    public synchronized static void setNibble(byte[] data, int index, int value) {
         int byteIndex = index / 2;
         int nibble = value & 0x0F;
         if (index % 2 == 0) {

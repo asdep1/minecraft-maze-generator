@@ -70,7 +70,7 @@ Utilisation d'IA (Junie par JetBrains) pour la génération du ReadMe.md et syst
 - [x] Choix des moyens d'exportation.
 - [x] Themes personnalisables par version via des fichiers.
 - [x] Choix de l'algorythme
-- [ ] Optimiser davantage l'exportation pour les labyrinthes de taille gigantesque.
+- [x] Optimiser davantage l'exportation pour les labyrinthes de taille gigantesque.
 - [ ] Ajouter une interface graphique (GUI) pour une configuration simplifiée.
 - [ ] Implémenter plus d'algorithmes de génération (ex: labyrinthes circulaires).
 - [ ] Ajouter un système de "biomes" au sein du même labyrinthe (changement de thème dynamique).

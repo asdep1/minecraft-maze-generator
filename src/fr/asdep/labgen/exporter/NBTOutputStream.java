@@ -13,10 +13,15 @@ public class NBTOutputStream implements AutoCloseable {
     }
 
     public NBTOutputStream(OutputStream os, boolean gzip) throws IOException {
+        OutputStream wrapped = new java.io.BufferedOutputStream(os, 65536);
         if (gzip) {
-            this.dos = new DataOutputStream(new java.util.zip.GZIPOutputStream(os));
+            this.dos = new DataOutputStream(new java.util.zip.GZIPOutputStream(wrapped) {
+                {
+                    def.setLevel(java.util.zip.Deflater.BEST_SPEED);
+                }
+            });
         } else {
-            this.dos = new DataOutputStream(os);
+            this.dos = new DataOutputStream(wrapped);
         }
     }
 
@@ -54,9 +59,22 @@ public class NBTOutputStream implements AutoCloseable {
     }
 
     public void writeTagByteArray(String name, byte[] value) throws IOException {
+        writeTagByteArray(name, value, null);
+    }
+
+    public void writeTagByteArray(String name, byte[] value, java.util.function.Consumer<Integer> progress) throws IOException {
         writeTagHeader(7, name);
         dos.writeInt(value.length);
-        dos.write(value);
+        if (progress != null) {
+            int chunkSize = 65536; // 64KB
+            for (int i = 0; i < value.length; i += chunkSize) {
+                int len = Math.min(chunkSize, value.length - i);
+                dos.write(value, i, len);
+                progress.accept(i + len);
+            }
+        } else {
+            dos.write(value);
+        }
     }
 
     public void writeTagListHeader(String name, byte type, int size) throws IOException {

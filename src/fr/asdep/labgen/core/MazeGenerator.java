@@ -3,6 +3,7 @@ package fr.asdep.labgen.core;
 import fr.asdep.labgen.mc.BlockRegistry;
 import fr.asdep.labgen.mc.BlockState;
 import fr.asdep.labgen.mc.Theme;
+import fr.asdep.labgen.utils.ProgressBar;
 import maze.Direction;
 import maze.Maze;
 
@@ -26,7 +27,7 @@ public class MazeGenerator {
         return registry;
     }
 
-    private short getOrCreatePaletteIndex(BlockState block) {
+    private synchronized short getOrCreatePaletteIndex(BlockState block) {
         if (block == null) return 0;
         for (short i = 0; i < palette.size(); i++) {
             if (block.equals(palette.get(i))) return i;
@@ -41,6 +42,7 @@ public class MazeGenerator {
 
     public void generate() {
         Maze maze = null;
+        System.out.println("Génération de la structure logique...");
         try {
             maze = config.getAlgorithm().getAlgoClass().getConstructor(int.class, int.class).newInstance(config.getWidth(), config.getDepth());
             maze.generate();
@@ -55,25 +57,29 @@ public class MazeGenerator {
         applyMazeToVoxels(maze);
         applyRooms();
         forceOuterBorders();
+        System.out.println("Génération terminée.");
     }
 
     private void generateFloorAndCeiling() {
         Theme theme = config.getTheme();
-        for (int x = 0; x < config.getTotalWidth(); x++) {
+        ProgressBar pb = new ProgressBar("Sol et Plafond", config.getTotalWidth());
+        java.util.stream.IntStream.range(0, config.getTotalWidth()).parallel().forEach(x -> {
             for (int z = 0; z < config.getTotalDepth(); z++) {
                 setBlockAt(x, 0, z, theme.getFloor());
                 if (config.isCeilingEnabled()) {
                     setBlockAt(x, config.getTotalHeight() - 1, z, theme.getCeiling());
                 }
             }
-        }
+            pb.step();
+        });
     }
 
     private void applyMazeToVoxels(Maze maze) {
         int cw = config.getCorridorWidth();
         int ww = config.getWallWidth();
 
-        for (int mz = 0; mz < maze.getHeight(); mz++) {
+        ProgressBar pb = new ProgressBar("Voxelisation", maze.getHeight());
+        java.util.stream.IntStream.range(0, maze.getHeight()).parallel().forEach(mz -> {
             for (int mx = 0; mx < maze.getWidth(); mx++) {
                 int vx = ww + mx * (cw + ww);
                 int vz = ww + mz * (cw + ww);
@@ -81,7 +87,8 @@ public class MazeGenerator {
                 fillVoxelArea(vx, 1, vz, cw, config.getHeight(), cw, (short) 0);
                 applyCellWalls(maze, mx, mz, vx, vz);
             }
-        }
+            pb.step();
+        });
     }
 
     private void applyCellWalls(Maze maze, int mx, int mz, int vx, int vz) {
@@ -130,13 +137,14 @@ public class MazeGenerator {
 
     private void applyErosion(Maze maze) {
         float baseErosion = config.getErosion();
-        java.util.Random rand = new java.util.Random();
+        if (baseErosion <= 0 && config.getErosionZones().isEmpty()) return;
 
-        for (int y = 0; y < maze.getHeight(); y++) {
+        ProgressBar pb = new ProgressBar("Érosion", maze.getHeight());
+        java.util.stream.IntStream.range(0, maze.getHeight()).parallel().forEach(y -> {
             for (int x = 0; x < maze.getWidth(); x++) {
                 if (x < maze.getWidth() - 1 && maze.isWall(x, y, Direction.EAST)) {
                     if (!isWallPartOfAnyRoom(x, y, Direction.EAST)) {
-                        if (rand.nextFloat() < calculateErosion(x, y, baseErosion)) {
+                        if (java.util.concurrent.ThreadLocalRandom.current().nextFloat() < calculateErosion(x, y, baseErosion)) {
                             maze.removeWall(x, y, Direction.EAST);
                         }
                     }
@@ -144,13 +152,14 @@ public class MazeGenerator {
 
                 if (y < maze.getHeight() - 1 && maze.isWall(x, y, Direction.SOUTH)) {
                     if (!isWallPartOfAnyRoom(x, y, Direction.SOUTH)) {
-                        if (rand.nextFloat() < calculateErosion(x, y, baseErosion)) {
+                        if (java.util.concurrent.ThreadLocalRandom.current().nextFloat() < calculateErosion(x, y, baseErosion)) {
                             maze.removeWall(x, y, Direction.SOUTH);
                         }
                     }
                 }
             }
-        }
+            pb.step();
+        });
     }
 
     private float calculateErosion(int x, int y, float baseErosion) {
@@ -173,9 +182,12 @@ public class MazeGenerator {
     }
 
     private void applyRooms() {
+        if (config.getRooms().isEmpty()) return;
         Theme theme = config.getTheme();
+        ProgressBar pb = new ProgressBar("Salles", config.getRooms().size());
         for (Room room : config.getRooms()) {
             applyRoom(room, theme);
+            pb.step();
         }
     }
 

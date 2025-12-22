@@ -2,6 +2,7 @@ package fr.asdep.labgen.exporter;
 
 import fr.asdep.labgen.core.MazeGenerator;
 import fr.asdep.labgen.mc.BlockState;
+import fr.asdep.labgen.utils.ProgressBar;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -17,6 +18,7 @@ public class ImageExporter {
 
         BufferedImage image = new BufferedImage(width, depth, BufferedImage.TYPE_INT_RGB);
 
+        ProgressBar pb = new ProgressBar("Export Image", width);
         for (int x = 0; x < width; x++) {
             for (int z = 0; z < depth; z++) {
                 BlockState state = generator.getBlockAt(x, 1, z);
@@ -28,6 +30,7 @@ public class ImageExporter {
                 }
                 image.setRGB(x, z, color);
             }
+            pb.step();
         }
 
         File outputFile = new File(filename);

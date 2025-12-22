@@ -2,12 +2,16 @@ package fr.asdep.labgen.exporter;
 
 import fr.asdep.labgen.core.MazeGenerator;
 import fr.asdep.labgen.mc.BlockState;
+import fr.asdep.labgen.utils.ProgressBar;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class WorldExporter {
 
@@ -27,12 +31,33 @@ public class WorldExporter {
 
         int regionsX = (chunksX + 31) / 32;
         int regionsZ = (chunksZ + 31) / 32;
+        int totalRegions = regionsX * regionsZ;
+
+        ProgressBar pb = new ProgressBar("Export Monde", totalRegions);
+        int cores = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(cores);
 
         for (int rz = 0; rz < regionsZ; rz++) {
             for (int rx = 0; rx < regionsX; rx++) {
-                String mcaName = "r." + rx + "." + rz + ".mca";
-                writeMCA(regionDir.resolve(mcaName), generator, rx, rz, chunksX, chunksZ);
+                final int frx = rx;
+                final int frz = rz;
+                executor.submit(() -> {
+                    try {
+                        String mcaName = "r." + frx + "." + frz + ".mca";
+                        writeMCA(regionDir.resolve(mcaName), generator, frx, frz, chunksX, chunksZ);
+                        pb.step();
+                    } catch (IOException e) {
+                        System.err.println("Erreur lors de l'exportation de la région " + frx + "," + frz + ": " + e.getMessage());
+                    }
+                });
             }
+        }
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.HOURS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 

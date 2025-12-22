@@ -128,19 +128,22 @@ public class Main {
         boolean exportSchematic = scanner.nextLine().trim().toLowerCase().equals("oui");
         if (exportSchematic) {
             System.out.print("Nom du fichier de sortie: ");
-            filename = scanner.nextLine().trim().isEmpty() ? filename : scanner.nextLine().trim();
+            String input = scanner.nextLine().trim();
+            if (!input.isEmpty()) filename = input;
         }
         System.out.print("Exporter en image PNG ? (oui/non) ");
         boolean exportImage = scanner.nextLine().trim().toLowerCase().equals("oui");
         if (exportImage) {
             System.out.print("Nom du fichier de sortie: ");
-            imageFilename = scanner.nextLine().trim().isEmpty() ? imageFilename : scanner.nextLine().trim();
+            String input = scanner.nextLine().trim();
+            if (!input.isEmpty()) imageFilename = input;
         }
         System.out.print("Exporter en monde ? (oui/non) ");
         boolean exportWorld = scanner.nextLine().trim().toLowerCase().equals("oui");
         if (exportWorld) {
             System.out.print("Nom du dossier de sortie: ");
-            worldName = scanner.nextLine().trim().isEmpty() ? worldName : scanner.nextLine().trim();
+            String input = scanner.nextLine().trim();
+            if (!input.isEmpty()) worldName = input;
         }
 
         // Theme selection

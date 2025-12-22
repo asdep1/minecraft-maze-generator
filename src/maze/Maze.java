@@ -86,7 +86,7 @@ public abstract class Maze implements Serializable {
      * @throws OutOfBoundsException if (x, y) is out of bounds
      * @throws NullPointerException if d is null
      */
-    public void addWall(int x, int y, Direction d) {
+    public synchronized void addWall(int x, int y, Direction d) {
         checkBounds(x, y);
         b[y * width + x] |= d.mask;
         int tx = x + d.dx;
@@ -134,7 +134,7 @@ public abstract class Maze implements Serializable {
      * @throws OutOfBoundsException if (x, y) is out of bounds
      * @throws NullPointerException if d is null
      */
-    public void removeWall(int x, int y, Direction d) {
+    public synchronized void removeWall(int x, int y, Direction d) {
         checkBounds(x, y);
         b[y * width + x] &= ~d.mask;
         int tx = x + d.dx;
