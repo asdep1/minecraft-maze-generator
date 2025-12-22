@@ -12,6 +12,7 @@ public class GenerationConfig {
     private float erosion; // Facteur d'erosion
     private boolean ceilingEnabled; // avec/sans plafond
     private Theme theme;
+    private MazeAlgorithm algorithm;
     private final java.util.List<Room> rooms;
     private final java.util.List<ErosionZone> erosionZones;
 
@@ -27,6 +28,7 @@ public class GenerationConfig {
         this.erosion = 0.0f;
         this.ceilingEnabled = true;
         this.theme = Theme.getDefault();
+        this.algorithm = MazeAlgorithm.RECURSIVE_BACKTRACKER;
         this.rooms = new java.util.ArrayList<>();
         this.erosionZones = new java.util.ArrayList<>();
         this.gameVersion = "1.12.2";
@@ -139,5 +141,32 @@ public class GenerationConfig {
 
     public int getTotalHeight() {
         return height + (ceilingEnabled ? 2 : 1); // + sol (+ plafond si activé)
+    }
+
+    public MazeAlgorithm getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(MazeAlgorithm algorithm) {
+        this.algorithm = algorithm;
+    }
+
+    @Override
+    public String toString() {
+        return "GenerationConfig{" +
+                "width=" + width +
+                ", depth=" + depth +
+                ", height=" + height +
+                ", baseY=" + baseY +
+                ", corridorWidth=" + corridorWidth +
+                ", wallWidth=" + wallWidth +
+                ", erosion=" + erosion +
+                ", ceilingEnabled=" + ceilingEnabled +
+                ", theme=" + theme +
+                ", algorithm=" + algorithm +
+                ", rooms=" + rooms +
+                ", erosionZones=" + erosionZones +
+                ", gameVersion='" + gameVersion + '\'' +
+                '}';
     }
 }

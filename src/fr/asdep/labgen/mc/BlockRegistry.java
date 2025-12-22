@@ -18,7 +18,7 @@ public class BlockRegistry {
     }
 
     private void loadFromCsv(String version) {
-        Path csvPath = Paths.get("versions", version + ".csv");
+        Path csvPath = Paths.get("versions/"+version, version + ".csv");
         if (!csvPath.toFile().exists()) {
             System.err.println("Warning: Registry file not found: " + csvPath);
             return;

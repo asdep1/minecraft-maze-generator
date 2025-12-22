@@ -1,0 +1,7 @@
+# Format: type;block_id;meta;weight
+# types: floor, walls, ceiling
+floor;minecraft:grass;0;1.0
+walls;minecraft:stone;0;1.0
+walls;minecraft:stonebrick;0;70.0
+walls;minecraft:stonebrick;1;30.0
+ceiling;minecraft:glass;0;1.0

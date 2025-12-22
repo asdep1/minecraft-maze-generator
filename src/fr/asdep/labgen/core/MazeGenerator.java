@@ -5,7 +5,8 @@ import fr.asdep.labgen.mc.BlockState;
 import fr.asdep.labgen.mc.Theme;
 import maze.Direction;
 import maze.Maze;
-import maze.RecursiveBacktracker;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class MazeGenerator {
     private final GenerationConfig config;
@@ -39,8 +40,14 @@ public class MazeGenerator {
     }
 
     public void generate() {
-        Maze maze = new RecursiveBacktracker(config.getWidth(), config.getDepth());
-        maze.generate();
+        Maze maze = null;
+        try {
+            maze = config.getAlgorithm().getAlgoClass().getConstructor(int.class, int.class).newInstance(config.getWidth(), config.getDepth());
+            maze.generate();
+        } catch (InstantiationException | SecurityException | NoSuchMethodException | InvocationTargetException |
+                 IllegalArgumentException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         applyErosion(maze);
         fillWithAir();

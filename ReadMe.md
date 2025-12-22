@@ -15,8 +15,8 @@ Un outil externe puissant pour générer des labyrinthes complexes et personnali
   - **Zones d'érosion** : Appliquez des facteurs d'érosion différents à des zones spécifiques (ex: une zone plus dévastée qu'une autre).
   - Protection automatique des murs extérieurs et des salles contre l'érosion.
 - **Thèmes et Blocs** :
-  - Définition de presets de blocs pour le sol, les murs et le plafond.
-  - **Sélection pondérée** : Gérez la rareté des blocs (ex: 70% de briques de pierre, 30% de briques moussues).
+  - Définition de presets de blocs pour le sol, les murs et le plafond via des fichiers externes dans `versions/{version}/themes/`.
+  - **Sélection pondérée** : Gérez la rareté des blocs directement dans le fichier de thème.
 - **Support Multi-version** :
   - Système de registre de blocs via fichiers CSV (`versions/`).
   - Compatible 1.12.2 (Legacy) et 1.20.1+ (Moderne).
@@ -66,10 +66,10 @@ Utilisation d'IA (Junie par JetBrains) pour la génération du ReadMe.md et syst
 
 ## 📝 TODO List
 
-- [ ] Utilisation pratique avec modification des valeurs.
-- [ ] Choix des moyens d'exportation.
-- [ ] Themes personnalisables par version via des fichiers JSON .
-- [ ] Support natif des versions plus récentes sans passer par le format Legacy pour les mondes.
+- [x] Utilisation pratique avec modification des valeurs.
+- [x] Choix des moyens d'exportation.
+- [x] Themes personnalisables par version via des fichiers.
+- [x] Choix de l'algorythme
 - [ ] Optimiser davantage l'exportation pour les labyrinthes de taille gigantesque.
 - [ ] Ajouter une interface graphique (GUI) pour une configuration simplifiée.
 - [ ] Implémenter plus d'algorithmes de génération (ex: labyrinthes circulaires).
