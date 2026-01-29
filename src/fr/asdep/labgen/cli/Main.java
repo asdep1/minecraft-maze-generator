@@ -41,18 +41,18 @@ public class Main {
 
             try {
                 parseArguments(args, generationConfig, exportConfig);
-                t(generationConfig, exportConfig);
+                generateAndExport(generationConfig, exportConfig);
             } catch (Exception e) {
                 System.err.println("Erreur lors du parsing des arguments : " + e.getMessage());
                 e.printStackTrace();
                 System.exit(1);
             }
         } else {
-            main();
+            startGenerationProcess();
         }
     }
 
-    public static void main() {
+    public static void startGenerationProcess() {
         System.out.println("=== Labyrinth Generator for Minecraft ===");
 
         Scanner scanner = new Scanner(System.in);
@@ -202,7 +202,7 @@ public class Main {
         }
         generationConfig.setAlgorithm(MazeAlgorithm.fromName(algorithmStr));
 
-        t(generationConfig, exportConfig);
+        generateAndExport(generationConfig, exportConfig);
     }
 
     private static void parseArguments(String[] args, GenerationConfig generationConfig, ExportConfig exportConfig) throws IOException {
@@ -326,7 +326,7 @@ public class Main {
         }
     }
 
-    public static void t(GenerationConfig generationConfig, ExportConfig exportConfig) {
+    public static void generateAndExport(GenerationConfig generationConfig, ExportConfig exportConfig) {
         System.out.println("Configuration :");
         System.out.println(generationConfig);
 
