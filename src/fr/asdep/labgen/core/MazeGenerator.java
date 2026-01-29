@@ -42,7 +42,7 @@ public class MazeGenerator {
 
     public void generate() {
         Maze maze = null;
-        System.out.println("Génération de la structure logique...");
+        ProgressBar pbStruct = new ProgressBar("Structure Logique", 1);
         try {
             maze = config.getAlgorithm().getAlgoClass().getConstructor(int.class, int.class).newInstance(config.getWidth(), config.getDepth());
             maze.generate();
@@ -50,13 +50,17 @@ public class MazeGenerator {
                  IllegalArgumentException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+        pbStruct.step();
 
         applyErosion(maze);
         fillWithAir();
         generateFloorAndCeiling();
         applyMazeToVoxels(maze);
         applyRooms();
+
+        ProgressBar pbBorders = new ProgressBar("Bordures", 1);
         forceOuterBorders();
+        pbBorders.step();
         System.out.println("Génération terminée.");
     }
 

@@ -4,6 +4,7 @@ import fr.asdep.labgen.core.*;
 import fr.asdep.labgen.exporter.ImageExporter;
 import fr.asdep.labgen.exporter.SchematicExporter;
 import fr.asdep.labgen.exporter.WorldExporter;
+import fr.asdep.labgen.gui.LabyrinthGUI;
 import fr.asdep.labgen.mc.Theme;
 import fr.asdep.labgen.mc.ThemeLoader;
 
@@ -48,7 +49,7 @@ public class Main {
                 System.exit(1);
             }
         } else {
-            startGenerationProcess();
+            LabyrinthGUI.main(args);
         }
     }
 

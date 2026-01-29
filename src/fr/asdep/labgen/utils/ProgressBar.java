@@ -1,6 +1,7 @@
 package fr.asdep.labgen.utils;
 
 public class ProgressBar {
+    private static TriConsumer<String, Integer, Integer> listener;
     private final String taskName;
     private final int total;
     private int current;
@@ -12,17 +13,35 @@ public class ProgressBar {
         this.current = 0;
         if (total > 0) {
             print();
+            notifyListener();
         }
+    }
+
+    public static void setListener(TriConsumer<String, Integer, Integer> listener) {
+        ProgressBar.listener = listener;
     }
 
     public synchronized void update(int value) {
         this.current = value;
         print();
+        notifyListener();
     }
 
     public synchronized void step() {
         this.current++;
         print();
+        notifyListener();
+    }
+
+    private void notifyListener() {
+        if (listener != null && total > 0) {
+            listener.accept(taskName, current, total);
+        }
+    }
+
+    @FunctionalInterface
+    public interface TriConsumer<T, U, V> {
+        void accept(T t, U u, V v);
     }
 
     private synchronized void print() {
