@@ -3,6 +3,7 @@ package fr.asdep.labgen.wui;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import fr.asdep.labgen.cli.Main;
 import fr.asdep.labgen.core.*;
 import fr.asdep.labgen.exporter.ImageExporter;
 import fr.asdep.labgen.exporter.SchematicExporter;
@@ -203,6 +204,7 @@ public class LabyrinthWUI {
             for (String v : getAvailableVersions()) {
                 versionsHtml.append("<option value='").append(v).append("'>").append(v).append("</option>");
             }
+            html = html.replace("{{VERSION}}", Main.VERSION);
             html = html.replace("{{VERSIONS}}", versionsHtml.toString());
 
             StringBuilder algorithmsHtml = new StringBuilder();
