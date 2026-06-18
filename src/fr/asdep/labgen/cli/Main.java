@@ -8,6 +8,7 @@ import fr.asdep.labgen.gui.LabyrinthGUI;
 import fr.asdep.labgen.mc.Theme;
 import fr.asdep.labgen.mc.ThemeLoader;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
@@ -327,7 +328,14 @@ public class Main {
         }
     }
 
-    public static void generateAndExport(GenerationConfig generationConfig, ExportConfig exportConfig) {
+    private static BufferedImage lastGeneratedImage;
+
+    public static BufferedImage getLastGeneratedImage() {
+        return lastGeneratedImage;
+    }
+
+    public static MazeGenerator generateAndExport(GenerationConfig generationConfig, ExportConfig exportConfig) {
+        lastGeneratedImage = null;
         System.out.println("Configuration :");
         System.out.println(generationConfig);
 
@@ -344,7 +352,7 @@ public class Main {
             }
 
             if (exportConfig.isExportImage()) {
-                ImageExporter.export(generator, exportConfig.getImageName() + ".png");
+                lastGeneratedImage = ImageExporter.export(generator, exportConfig.getImageName() + ".png");
                 System.out.println("  - Exporté vers " + exportConfig.getImageName() + ".png (Image PNG)");
             }
 
@@ -358,5 +366,6 @@ public class Main {
             System.err.println("Erreur lors de l'exportation : " + e.getMessage());
             e.printStackTrace();
         }
+        return generator;
     }
 }

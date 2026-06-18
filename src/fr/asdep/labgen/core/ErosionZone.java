@@ -1,9 +1,9 @@
 package fr.asdep.labgen.core;
 
 public class ErosionZone {
-    private final int x, z;
-    private final int width, depth;
-    private final float factor;
+    private int x, z;
+    private int width, depth;
+    private float factor;
 
     public ErosionZone(int x, int z, int width, int depth, float factor) {
         this.x = x;
@@ -21,19 +21,39 @@ public class ErosionZone {
         return factor;
     }
 
+    public void setFactor(float factor) {
+        this.factor = factor;
+    }
+
     public int getX() {
         return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
     }
 
     public int getZ() {
         return z;
     }
 
+    public void setZ(int z) {
+        this.z = z;
+    }
+
     public int getWidth() {
         return width;
     }
 
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
     public int getDepth() {
         return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
     }
 }
