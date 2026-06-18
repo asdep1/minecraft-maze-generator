@@ -15,6 +15,8 @@ import java.util.Scanner;
 
 public class Main {
 
+    public static final String VERSION = "1.0.2";
+
     /**
      * -v version (1.12.2, 1.20.1)
      * -w width (250)
@@ -37,6 +39,7 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
+        System.out.println("=== Labyrinth Generator for Minecraft (" + VERSION + ") ===");
         if (args.length > 0) {
             GenerationConfig generationConfig = new GenerationConfig();
             ExportConfig exportConfig = new ExportConfig();
