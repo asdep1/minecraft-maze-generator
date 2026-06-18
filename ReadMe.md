@@ -62,8 +62,17 @@ java -Xmx2G minecraft-maze-generator-1.0.1.jar -v 1.12.2 -w 250 -d 250 -h 25 -c 
 
 Utilsation sans paramètres dans un terminal :
 ```shell
-java -Xmx2G minecraft-maze-generator-1.0.1.jar`
+java -Xmx2G minecraft-maze-generator-1.0.1.jar
 ```
+
+### Interface Web (WUI)
+
+Vous pouvez également lancer un serveur web local pour configurer votre labyrinthe via une interface graphique dans votre navigateur :
+
+```shell
+java -cp minecraft-maze-generator-1.0.1.jar fr.asdep.labgen.wui.LabyrinthWUI 8080
+```
+Accédez ensuite à `http://localhost:8080`.
 
 Pallete de blocs par version dans `versions/`.
 
