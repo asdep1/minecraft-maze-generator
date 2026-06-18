@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang='fr'>
+<head>
+    <meta charset="UTF-8">
+    <title>Minecraft Labyrinth Generator - WUI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class='container'>
+        <h1>Générateur de Labyrinthe Minecraft</h1>
+        
+        <div id='size-display'>Taille totale: 0 x 0 x 0 (blocs)</div>
+
+        <form action='/generate' method='POST' id='genForm' onsubmit='event.preventDefault(); startGeneration();'>
+            
+            <div class='section'>
+                <h2>Configuration de base</h2>
+                <div class='form-group'>
+                    <label>Version:</label>
+                    <select name='version' id='version' onchange='updateThemes()'>
+                        {{VERSIONS}}
+                    </select>
+                </div>
+                
+                <div class='form-group'><label>Largeur (X cellules):</label><input type='number' name='width' id='width' value='20' oninput='updateSize()'></div>
+                <div class='form-group'><label>Profondeur (Z cellules):</label><input type='number' name='depth' id='depth' value='20' oninput='updateSize()'></div>
+                <div class='form-group'><label>Hauteur (Y blocs):</label><input type='number' name='height' id='height' value='3' oninput='updateSize()'></div>
+                <div class='form-group'><label>Largeur Couloirs:</label><input type='number' name='corridorWidth' id='corridorWidth' value='1' oninput='updateSize()'></div>
+                <div class='form-group'><label>Épaisseur Murs:</label><input type='number' name='wallWidth' id='wallWidth' value='1' oninput='updateSize()'></div>
+                <div class='form-group'><label>Érosion (0.0-1.0):</label><input type='text' name='erosion' value='0.0'></div>
+                <div class='form-group'><label>Base Y:</label><input type='number' name='baseY' value='64'></div>
+                <div class='form-group'><label>Plafond:</label><input type='checkbox' name='ceiling' id='ceiling' value='true' checked onchange='updateSize()'></div>
+                <div class='form-group'>
+                    <label>Algorithme:</label>
+                    <select name='algorithm'>
+                        {{ALGORITHMS}}
+                    </select>
+                </div>
+                <div class='form-group'><label>Thème:</label><select name='theme' id='theme'></select></div>
+                <div class='form-group'>
+                    <label>Type d'export:</label>
+                    <select name='exportType'>
+                        <option value='schematic'>Schematic (.schematic)</option>
+                        <option value='world'>Monde Minecraft (ZIP)</option>
+                        <option value='image'>Image PNG (.png)</option>
+                    </select>
+                </div>
+                <div class='form-group'><label>Nom du fichier/monde:</label><input type='text' name='schematicName' value='labyrinth'></div>
+            </div>
+
+            <div class='section'>
+                <h2>Salles</h2>
+                <div class='form-group'>
+                    X: <input type='number' id='room_x' value='0' style='width:50px'> 
+                    Z: <input type='number' id='room_z' value='0' style='width:50px'> 
+                    W: <input type='number' id='room_w' value='5' style='width:50px'> 
+                    D: <input type='number' id='room_d' value='5' style='width:50px'> 
+                    E: <input type='number' id='room_e' value='1' style='width:40px'> 
+                    <button type='button' onclick='addRoom()'>Ajouter</button>
+                </div>
+                <div id='room_list' class='list-container'></div>
+                <div id='room_inputs'></div>
+            </div>
+
+            <div class='section'>
+                <h2>Zones d'érosion</h2>
+                <div class='form-group'>
+                    X: <input type='number' id='ez_x' value='0' style='width:50px'> 
+                    Z: <input type='number' id='ez_z' value='0' style='width:50px'> 
+                    W: <input type='number' id='ez_w' value='10' style='width:50px'> 
+                    D: <input type='number' id='ez_d' value='10' style='width:50px'> 
+                    F: <input type='text' id='ez_f' value='0.5' style='width:40px'> 
+                    <button type='button' onclick='addEZ()'>Ajouter</button>
+                </div>
+                <div id='ez_list' class='list-container'></div>
+                <div id='ez_inputs'></div>
+            </div>
+
+            <div style='text-align:center;margin-top:20px;'>
+                <button type='submit' style='font-size:1.2em;background:#2ecc71;'>Générer et Télécharger</button>
+            </div>
+            
+        </form>
+
+        <div class='progress-container' id='progress-container'>
+            <div id='progress-task'>Préparation...</div>
+            <div class='progress-bar'><div class='progress-fill' id='progress-fill'></div></div>
+            <div id='progress-text' style='text-align:right;margin-top:5px;'>0%</div>
+        </div>
+
+    </div>
+
+    <script>
+        const themes = {{THEMES_JSON}};
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

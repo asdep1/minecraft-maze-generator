@@ -1,0 +1,108 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 20px;
+    background: #f4f4f9;
+    color: #333;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-top: 0;
+}
+.section {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+.section h2 {
+    font-size: 1.2em;
+    color: #34495e;
+    margin-bottom: 15px;
+}
+.form-group {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+label {
+    display: inline-block;
+    width: 180px;
+    font-weight: 600;
+}
+input[type='number'], input[type='text'], select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 200px;
+}
+button {
+    padding: 10px 20px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+button:hover {
+    background: #2980b9;
+}
+.list-container {
+    margin-top: 10px;
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+.remove-btn {
+    background: #e74c3c;
+    padding: 5px 10px;
+    font-size: 0.8em;
+}
+.remove-btn:hover {
+    background: #c0392b;
+}
+#size-display {
+    background: #ecf0f1;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+.progress-container {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.progress-bar {
+    height: 20px;
+    background: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+.progress-fill {
+    height: 100%;
+    background: #2ecc71;
+    width: 0%;
+    transition: width 0.3s;
+}
