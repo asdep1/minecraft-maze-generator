@@ -1,7 +1,7 @@
 package fr.asdep.labgen.utils;
 
 public class ProgressBar {
-    private static TriConsumer<String, Integer, Integer> listener;
+    private static final ThreadLocal<TriConsumer<String, Integer, Integer>> listener = new ThreadLocal<>();
     private final String taskName;
     private final int total;
     private int current;
@@ -18,7 +18,11 @@ public class ProgressBar {
     }
 
     public static void setListener(TriConsumer<String, Integer, Integer> listener) {
-        ProgressBar.listener = listener;
+        ProgressBar.listener.set(listener);
+    }
+
+    public static void clearListener() {
+        ProgressBar.listener.remove();
     }
 
     public synchronized void update(int value) {
@@ -34,8 +38,9 @@ public class ProgressBar {
     }
 
     private void notifyListener() {
-        if (listener != null && total > 0) {
-            listener.accept(taskName, current, total);
+        TriConsumer<String, Integer, Integer> l = listener.get();
+        if (l != null && total > 0) {
+            l.accept(taskName, current, total);
         }
     }
 

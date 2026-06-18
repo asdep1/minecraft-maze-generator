@@ -91,17 +91,17 @@ function startGeneration() {
     fetch('/generate', { method: 'POST', body: params })
         .then(r => r.json())
         .then(data => {
-            if (data.status === 'started') {
-                startPolling();
+            if (data.status === 'started' && data.id) {
+                startPolling(data.id);
             }
         });
 }
 
 let progInterval;
-function startPolling() {
+function startPolling(genId) {
     if (progInterval) clearInterval(progInterval);
     progInterval = setInterval(() => {
-        fetch('/progress').then(r => r.json()).then(data => {
+        fetch('/progress?id=' + genId).then(r => r.json()).then(data => {
             if (data.task) {
                 document.getElementById('progress-task').textContent = data.task;
                 const p = Math.round((data.current / data.total) * 100);
@@ -110,7 +110,7 @@ function startPolling() {
 
                 if (data.finished) {
                     clearInterval(progInterval);
-                    window.location.href = '/download';
+                    window.location.href = '/download?id=' + genId;
                     setTimeout(() => { document.getElementById('progress-container').style.display = 'none'; }, 3000);
                 } else if (data.task.startsWith('Erreur:')) {
                     clearInterval(progInterval);

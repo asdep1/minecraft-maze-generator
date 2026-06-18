@@ -62,7 +62,6 @@ public class LabyrinthWUI {
         }
 
         ProgressBar.setListener((task, current, total) -> {
-            progressMap.put("latest", new ProgressInfo(task, current, total));
         });
 
         HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
@@ -80,11 +79,17 @@ public class LabyrinthWUI {
     static class ProgressHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            ProgressInfo info = progressMap.get("latest");
-            boolean finished = info != null && info.task != null && info.task.toLowerCase().contains("terminé");
+            Map<String, String> queryParams = parseQuery(exchange.getRequestURI().getQuery());
+            String id = queryParams.get("id");
+            if (id == null) {
+                exchange.sendResponseHeaders(400, -1);
+                return;
+            }
+
+            ProgressInfo info = progressMap.get(id);
             String json = info == null ? "{}" : String.format(
                 "{\"task\":\"%s\", \"current\":%d, \"total\":%d, \"finished\":%b}",
-                info.task, info.current, info.total, generatedFiles.containsKey("latest")
+                info.task, info.current, info.total, generatedFiles.containsKey(id)
             );
             byte[] bytes = json.getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -98,7 +103,14 @@ public class LabyrinthWUI {
     static class DownloadHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            GeneratedFile file = generatedFiles.get("latest");
+            Map<String, String> queryParams = parseQuery(exchange.getRequestURI().getQuery());
+            String id = queryParams.get("id");
+            if (id == null) {
+                exchange.sendResponseHeaders(400, -1);
+                return;
+            }
+
+            GeneratedFile file = generatedFiles.get(id);
             if (file == null) {
                 exchange.sendResponseHeaders(404, -1);
                 return;
@@ -110,7 +122,8 @@ public class LabyrinthWUI {
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(file.content);
             }
-            generatedFiles.remove("latest");
+            generatedFiles.remove(id);
+            progressMap.remove(id);
         }
     }
 
@@ -286,10 +299,12 @@ public class LabyrinthWUI {
             }
 
             Map<String, String> params = parseFormData(readRequestBody(exchange));
-            progressMap.clear();
-            generatedFiles.remove("latest");
+            String genId = UUID.randomUUID().toString();
 
             executor.submit(() -> {
+                ProgressBar.setListener((task, current, total) -> {
+                    progressMap.put(genId, new ProgressInfo(task, current, total));
+                });
                 try {
                     GenerationConfig genConfig = parseConfig(params);
                     MazeGenerator generator = new MazeGenerator(genConfig);
@@ -315,16 +330,18 @@ public class LabyrinthWUI {
                         SchematicExporter.export(generator, baos);
                     }
 
-                    generatedFiles.put("latest", new GeneratedFile(baos.toByteArray(), contentType, filename));
-                    progressMap.put("latest", new ProgressInfo("Terminé", 100, 100));
+                    generatedFiles.put(genId, new GeneratedFile(baos.toByteArray(), contentType, filename));
+                    progressMap.put(genId, new ProgressInfo("Terminé", 100, 100));
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    progressMap.put("latest", new ProgressInfo("Erreur: " + e.getMessage(), 0, 100));
+                    progressMap.put(genId, new ProgressInfo("Erreur: " + e.getMessage(), 0, 100));
+                } finally {
+                    ProgressBar.clearListener();
                 }
             });
 
-            String response = "{\"status\":\"started\"}";
+            String response = String.format("{\"status\":\"started\", \"id\":\"%s\"}", genId);
             byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().set("Content-Type", "application/json");
             exchange.sendResponseHeaders(200, bytes.length);
@@ -332,6 +349,23 @@ public class LabyrinthWUI {
                 os.write(bytes);
             }
         }
+    }
+
+    private static Map<String, String> parseQuery(String query) {
+        Map<String, String> params = new HashMap<>();
+        if (query == null || query.isEmpty()) return params;
+        String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            int idx = pair.indexOf("=");
+            if (idx > 0) {
+                try {
+                    String key = URLDecoder.decode(pair.substring(0, idx), StandardCharsets.UTF_8.name());
+                    String value = URLDecoder.decode(pair.substring(idx + 1), StandardCharsets.UTF_8.name());
+                    params.put(key, value);
+                } catch (UnsupportedEncodingException ignored) {}
+            }
+        }
+        return params;
     }
 
     private static Map<String, String> parseFormData(String formData) throws UnsupportedEncodingException {
