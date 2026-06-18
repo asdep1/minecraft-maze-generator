@@ -357,7 +357,7 @@ public class Main {
             }
 
             if (exportConfig.isExportWorld()) {
-                WorldExporter.export(generator, exportConfig.getWorldName());
+                WorldExporter.export(generator, ".", exportConfig.getWorldName());
                 System.out.println("  - Exporté vers le dossier monde: " + exportConfig.getWorldName());
             }
 

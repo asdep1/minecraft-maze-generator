@@ -14,6 +14,11 @@ public class MazeGenerator {
     private final short[] voxelData;
     private final java.util.List<BlockState> palette;
     private final BlockRegistry registry;
+    private boolean generated = false;
+
+    public boolean isGenerated() {
+        return generated;
+    }
 
     public MazeGenerator(GenerationConfig config) {
         this.config = config;
@@ -62,6 +67,7 @@ public class MazeGenerator {
         forceOuterBorders();
         pbBorders.step();
         System.out.println("Génération terminée.");
+        generated = true;
     }
 
     private void generateFloorAndCeiling() {

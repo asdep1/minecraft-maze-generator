@@ -6,17 +6,55 @@ import fr.asdep.labgen.utils.ProgressBar;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class WorldExporter {
 
-    public static void export(MazeGenerator generator, String worldName) throws IOException {
-        Path worldPath = Paths.get(worldName);
+    public static void exportToZip(MazeGenerator generator, String worldName, OutputStream os) throws IOException {
+        Path tempDir = Files.createTempDirectory("labgen_world_");
+        try {
+            export(generator, tempDir.toString(), worldName);
+            try (ZipOutputStream zos = new ZipOutputStream(os)) {
+                zipDirectory(tempDir, tempDir, zos);
+            }
+        } finally {
+            deleteDirectory(tempDir);
+        }
+    }
+
+    private static void zipDirectory(Path root, Path source, ZipOutputStream zos) throws IOException {
+        Files.walk(source).forEach(path -> {
+            try {
+                if (Files.isDirectory(path)) return;
+                String name = root.relativize(path).toString().replace("\\", "/");
+                zos.putNextEntry(new ZipEntry(name));
+                Files.copy(path, zos);
+                zos.closeEntry();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private static void deleteDirectory(Path path) throws IOException {
+        if (Files.exists(path)) {
+            Files.walk(path)
+                .sorted(java.util.Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(java.io.File::delete);
+        }
+    }
+
+    public static void export(MazeGenerator generator, String folderPath, String worldName) throws IOException {
+        Path worldPath = Paths.get(folderPath);
         Files.createDirectories(worldPath);
         Path regionDir = worldPath.resolve("region");
         Files.createDirectories(regionDir);

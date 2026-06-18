@@ -6,10 +6,17 @@ import fr.asdep.labgen.utils.ProgressBar;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class SchematicExporter {
 
     public static void export(MazeGenerator generator, String filePath) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            export(generator, fos);
+        }
+    }
+
+    public static void export(MazeGenerator generator, OutputStream os) throws IOException {
         short[] data = generator.getVoxelData();
         int width = generator.getConfig().getTotalWidth();
         int height = generator.getConfig().getTotalHeight();
@@ -46,7 +53,7 @@ public class SchematicExporter {
         ProgressBar pbSave = new ProgressBar("Schematic Save", (int) (totalBytes / 1024));
         final long[] written = {0};
 
-        try (NBTOutputStream nos = new NBTOutputStream(new FileOutputStream(filePath))) {
+        try (NBTOutputStream nos = new NBTOutputStream(os)) {
             nos.writeTagCompound("Schematic");
             nos.writeTagShort("Width", (short) width);
             nos.writeTagShort("Height", (short) height);
