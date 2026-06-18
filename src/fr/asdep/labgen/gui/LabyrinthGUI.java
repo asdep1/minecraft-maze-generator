@@ -54,7 +54,7 @@ public class LabyrinthGUI extends JFrame {
     private GenerationConfig currentConfig;
 
     public LabyrinthGUI() {
-        setTitle("Labyrinth Generator for Minecraft");
+        setTitle("Generateur de Labyrinthe (" + Main.VERSION + ")");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1100, 850);
         setLocationRelativeTo(null);
